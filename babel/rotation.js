@@ -14,14 +14,12 @@ var loopPic = {
     activeId: $('.active').attr('value') - 0, //当前图对应的原点
     imgLength: $('.images img').length, //图片总数
     isFinish: true, //判断是否完成动画
-    setTime: function setTime() {
-        var _this = this;
-
+    listenAnimationEnd: function listenAnimationEnd() {
         //动画完成后设置状态 
-        var time = setInterval(function () {
+        var _this = this;
+        $('.images img').on('animationend webkitAnimationEnd', function () {
             _this.isFinish = true;
-            clearInterval(time);
-        }, 1050);
+        });
     },
 
     //左移时，改变圆点状态
@@ -57,7 +55,6 @@ var loopPic = {
             } else {
                 this.leftActive();
             }
-            this.setTime();
         }
     },
 
@@ -76,7 +73,6 @@ var loopPic = {
             } else {
                 this.rightActive();
             }
-            this.setTime();
         }
     },
 
@@ -91,12 +87,11 @@ var loopPic = {
                 } else {
                     this.turnRight($('img[value="' + nowValue + '"]'), e);
                 }
-                this.setTime();
             }
         }
     }
 };
-
+loopPic.listenAnimationEnd();
 $('.images').on('touchstart', function (e) {
     startX = e.touches[0].pageX;
 });

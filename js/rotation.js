@@ -10,11 +10,11 @@ var loopPic = {
     activeId: $('.active').attr('value') - 0,//当前图对应的原点
     imgLength: $('.images img').length,//图片总数
     isFinish: true, //判断是否完成动画
-    setTime () { //动画完成后设置状态 
-        let time = setInterval(() => {
-            this.isFinish = true
-            clearInterval(time)
-        }, 1050)
+    listenAnimationEnd () { //动画完成后设置状态 
+        let _this = this
+        $('.images img').on('animationend webkitAnimationEnd', () => {
+            _this.isFinish = true
+        })
     }, 
     //左移时，改变圆点状态
     leftActive () {
@@ -44,7 +44,6 @@ var loopPic = {
             } else {
                 this.leftActive()
             }
-            this.setTime()
         }
     },
     //正方形向右移动
@@ -59,7 +58,6 @@ var loopPic = {
             } else {
                 this.rightActive()
             }
-            this.setTime()
         }
     },
     //点击圆点时正方形的移动
@@ -73,12 +71,11 @@ var loopPic = {
                 } else {
                     this.turnRight($(`img[value="${nowValue}"]`), e) 
                 }
-                this.setTime()
             }
         }
     }
 }
-
+loopPic.listenAnimationEnd()
 $('.images').on('touchstart', (e) => {
     startX = e.touches[0].pageX
 })
