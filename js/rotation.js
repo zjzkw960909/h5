@@ -5,7 +5,7 @@
  */
 
 let startX, endX, offset
-
+let test = 3
 var loopPic = {
     activeId: $('.active').attr('value') - 0,//当前图对应的原点
     imgLength: $('.images img').length,//图片总数
@@ -90,6 +90,7 @@ $('.images').on('touchend', (e) => {
         }
     }
 })
+
 
 $('.pages').on('click', (e) => {
     loopPic.turnClick(e)
