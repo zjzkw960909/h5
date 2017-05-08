@@ -5,7 +5,6 @@
  */
 
 let startX, endX, offset
-let test = 3
 var loopPic = {
     activeId: $('.active').attr('value') - 0,//当前图对应的原点
     imgLength: $('.images img').length,//图片总数
@@ -14,49 +13,47 @@ var loopPic = {
         let _this = this
         $('.images img').on('animationend webkitAnimationEnd', () => {
             _this.isFinish = true
+            let showImgValue = $('.midImg').attr('value')
+            if (showImgValue - 0 === 1) {
+                $('.images .leftImg').removeClass().addClass('rightImg')
+            }
+            if (showImgValue - 0 === _this.imgLength) {
+                $('.images .rightImg').removeClass().addClass('leftImg')
+            }
         })
     }, 
-    //左移时，改变圆点状态
-    leftActive () {
-        this.activeId = $('.active').attr('value') - 0
-        if (this.activeId !== this.imgLength) {
-            $('.active').removeClass('active')
-            $(`.circle[value="${this.activeId + 1}"]`).addClass('active')
-        }
+    active () { 
+        this.activeId = $('.midImg').attr('value') - 0
+        $('.active').removeClass('active')
+        $(`.circle[value="${this.activeId}"]`).addClass('active')
     },
-    //右移时，改变原点状态
-    rightActive () { 
-        this.activeId = $('.active').attr('value') - 0
-        if (this.activeId !== 1) {
-            $('.active').removeClass('active')
-            $(`.circle[value="${this.activeId - 1}"]`).addClass('active')
-        }
-    },
-    //正方形向左移动
-    turnLeft (e = $($('.rightImg')[0]), clickCircle = null) {
-        if ((clickCircle || $('.rightImg').length) && this.isFinish) {
+    turn (way, e, clickCircle = null) {
+        if (this.isFinish) {
             this.isFinish = false
-            $('.midImg').removeClass().addClass('midToLeft leftImg')
-            e.removeClass().addClass('rightToMid midImg')
-            if (clickCircle) {
-                $('.active').removeClass('active')
-                $(clickCircle.target).addClass('active')
+            if (way === 'right') {
+                e = e || $($('.rightImg')[0])
+                if ($('.midImg').attr('value') - 0 < this.imgLength) {
+                    $('.midImg').removeClass().addClass('midToLeft leftImg')
+                    e.removeClass().addClass('rightToMid midImg')
+                } else {
+                    $('.midImg').removeClass().addClass('midToLeft leftImg')
+                    $($('.images img')[0]).removeClass().addClass('rightToMid midImg')
+                }
             } else {
-                this.leftActive()
+                e = e || $($('.leftImg')[$('.leftImg').length - 1])
+                if ($('.midImg').attr('value') - 0 > 1) {
+                    $('.midImg').removeClass().addClass('midToRight rightImg')
+                    e.removeClass().addClass('leftToMid midImg')
+                } else {
+                    $('.midImg').removeClass().addClass('midToRight rightImg')
+                    $($('.images img')[this.imgLength - 1]).removeClass().addClass('leftToMid midImg')
+                }
             }
-        }
-    },
-    //正方形向右移动
-    turnRight (e = $($('.leftImg')[$('.leftImg').length - 1]), clickCircle = null)  {
-        if ((clickCircle || $('.leftImg').length) && this.isFinish) {
-            this.isFinish = false
-            $('.midImg').removeClass().addClass('midToRight rightImg')
-            e.removeClass().addClass('leftToMid midImg')
             if (clickCircle) {
                 $('.active').removeClass('active')
                 $(clickCircle.target).addClass('active')
             } else {
-                this.rightActive()
+                this.active()
             }
         }
     },
@@ -67,9 +64,9 @@ var loopPic = {
             if (!$(e.target).hasClass('active')) {
                 this.activeId = $('.active').attr('value') - 0
                 if (this.activeId < nowValue) {
-                    this.turnLeft($(`img[value="${nowValue}"]`), e)
+                    this.turn('right', $(`img[value="${nowValue}"]`), e)
                 } else {
-                    this.turnRight($(`img[value="${nowValue}"]`), e) 
+                    this.turn('left', $(`img[value="${nowValue}"]`), e) 
                 }
             }
         }
@@ -84,9 +81,9 @@ $('.images').on('touchend', (e) => {
     offset = endX - startX
     if (Math.abs(offset) > 30) {
         if (offset >= 0) {
-            loopPic.turnRight()
+            loopPic.turn('left')
         } else {
-            loopPic.turnLeft()
+            loopPic.turn('right')
         }
     }
 })
@@ -96,8 +93,8 @@ $('.pages').on('click', (e) => {
     loopPic.turnClick(e)
 })
 $('.leftIcon').on('click', () => {
-    loopPic.turnRight()
+    loopPic.turn('left')
 })
 $('.rightIcon').on('click', () => {
-    loopPic.turnLeft()
+    loopPic.turn('right')
 })

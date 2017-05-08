@@ -19,59 +19,49 @@ var loopPic = {
         var _this = this;
         $('.images img').on('animationend webkitAnimationEnd', function () {
             _this.isFinish = true;
+            var showImgValue = $('.midImg').attr('value');
+            if (showImgValue - 0 === 1) {
+                $('.images .leftImg').removeClass().addClass('rightImg');
+            }
+            if (showImgValue - 0 === _this.imgLength) {
+                $('.images .rightImg').removeClass().addClass('leftImg');
+            }
         });
     },
-
-    //左移时，改变圆点状态
-    leftActive: function leftActive() {
-        this.activeId = $('.active').attr('value') - 0;
-        if (this.activeId !== this.imgLength) {
-            $('.active').removeClass('active');
-            $('.circle[value="' + (this.activeId + 1) + '"]').addClass('active');
-        }
+    active: function active() {
+        this.activeId = $('.midImg').attr('value') - 0;
+        $('.active').removeClass('active');
+        $('.circle[value="' + this.activeId + '"]').addClass('active');
     },
+    turn: function turn(way, e) {
+        var clickCircle = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
-    //右移时，改变原点状态
-    rightActive: function rightActive() {
-        this.activeId = $('.active').attr('value') - 0;
-        if (this.activeId !== 1) {
-            $('.active').removeClass('active');
-            $('.circle[value="' + (this.activeId - 1) + '"]').addClass('active');
-        }
-    },
-
-    //正方形向左移动
-    turnLeft: function turnLeft() {
-        var e = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : $($('.rightImg')[0]);
-        var clickCircle = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-        if ((clickCircle || $('.rightImg').length) && this.isFinish) {
+        if (this.isFinish) {
             this.isFinish = false;
-            $('.midImg').removeClass().addClass('midToLeft leftImg');
-            e.removeClass().addClass('rightToMid midImg');
-            if (clickCircle) {
-                $('.active').removeClass('active');
-                $(clickCircle.target).addClass('active');
+            if (way === 'right') {
+                e = e || $($('.rightImg')[0]);
+                if ($('.midImg').attr('value') - 0 < this.imgLength) {
+                    $('.midImg').removeClass().addClass('midToLeft leftImg');
+                    e.removeClass().addClass('rightToMid midImg');
+                } else {
+                    $('.midImg').removeClass().addClass('midToLeft leftImg');
+                    $($('.images img')[0]).removeClass().addClass('rightToMid midImg');
+                }
             } else {
-                this.leftActive();
+                e = e || $($('.leftImg')[$('.leftImg').length - 1]);
+                if ($('.midImg').attr('value') - 0 > 1) {
+                    $('.midImg').removeClass().addClass('midToRight rightImg');
+                    e.removeClass().addClass('leftToMid midImg');
+                } else {
+                    $('.midImg').removeClass().addClass('midToRight rightImg');
+                    $($('.images img')[this.imgLength - 1]).removeClass().addClass('leftToMid midImg');
+                }
             }
-        }
-    },
-
-    //正方形向右移动
-    turnRight: function turnRight() {
-        var e = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : $($('.leftImg')[$('.leftImg').length - 1]);
-        var clickCircle = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-        if ((clickCircle || $('.leftImg').length) && this.isFinish) {
-            this.isFinish = false;
-            $('.midImg').removeClass().addClass('midToRight rightImg');
-            e.removeClass().addClass('leftToMid midImg');
             if (clickCircle) {
                 $('.active').removeClass('active');
                 $(clickCircle.target).addClass('active');
             } else {
-                this.rightActive();
+                this.active();
             }
         }
     },
@@ -83,9 +73,9 @@ var loopPic = {
             if (!$(e.target).hasClass('active')) {
                 this.activeId = $('.active').attr('value') - 0;
                 if (this.activeId < nowValue) {
-                    this.turnLeft($('img[value="' + nowValue + '"]'), e);
+                    this.turn('right', $('img[value="' + nowValue + '"]'), e);
                 } else {
-                    this.turnRight($('img[value="' + nowValue + '"]'), e);
+                    this.turn('left', $('img[value="' + nowValue + '"]'), e);
                 }
             }
         }
@@ -100,9 +90,9 @@ $('.images').on('touchend', function (e) {
     offset = endX - startX;
     if (Math.abs(offset) > 30) {
         if (offset >= 0) {
-            loopPic.turnRight();
+            loopPic.turn('left');
         } else {
-            loopPic.turnLeft();
+            loopPic.turn('right');
         }
     }
 });
@@ -111,8 +101,8 @@ $('.pages').on('click', function (e) {
     loopPic.turnClick(e);
 });
 $('.leftIcon').on('click', function () {
-    loopPic.turnRight();
+    loopPic.turn('left');
 });
 $('.rightIcon').on('click', function () {
-    loopPic.turnLeft();
+    loopPic.turn('right');
 });
